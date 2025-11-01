@@ -7,93 +7,143 @@
   <link href="https://fonts.googleapis.com/css?family=Share+Tech+Mono|Unbounded:700" rel="stylesheet">
   <style>
     html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background: #000;
-      color: #fff;
-      overflow: hidden;
+      margin: 0; padding: 0; height: 100%; background: #000; color: #fff; scroll-behavior: smooth;
       font-family: 'Share Tech Mono', monospace;
     }
-    body {
-      width: 100vw;
-      height: 100vh;
-      position: relative;
-    }
+    body { min-height: 100vh; position: relative; }
+
     #bg-canvas {
-      position: fixed;
-      left: 0; top: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 0;
-      pointer-events: none;
-      filter: blur(2px) contrast(1.3) grayscale(1);
-      opacity: 0.85;
+      position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 0;
+      pointer-events: none; filter: blur(2px) contrast(1.3) grayscale(1); opacity: 0.85;
     }
-    .main-content {
-      z-index: 1;
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      width: 85vw;
-      max-width: 700px;
-      background: rgba(0,0,0,0.7);
-      box-shadow: 0 0 120px 30px #fff1, 0 0 0 1px #fff3 inset;
-      border-radius: 24px;
-      padding: 48px 32px;
-      backdrop-filter: blur(4px);
+
+    nav {
+      width: 100vw; position: fixed; top: 0; left: 0; z-index: 10; background: rgba(0,0,0,0.92);
+      display: flex; justify-content: center; align-items: center; height: 64px;
+      box-shadow: 0 2px 32px #fff1, 0 0 0 1px #fff2 inset;
+      border-bottom: 2px solid #fff2;
+      backdrop-filter: blur(3px);
       animation: flickerbox 3s infinite alternate cubic-bezier(.86,0,.07,1);
     }
-    h1 {
-      font-family: 'Unbounded', 'Share Tech Mono', monospace;
-      font-size: 3.2rem;
-      letter-spacing: 0.25em;
-      color: #fff;
-      text-shadow: 
-        0 0 12px #fff, 
-        0 0 30px #0ff5, 
-        0 0 2px #fff, 
-        0 0 1px #fff;
-      animation: flicker 4s infinite linear;
+    nav ul {
+      list-style: none; display: flex; gap: 2.5vw; margin: 0; padding: 0;
     }
-    p {
-      font-size: 1.25rem;
-      color: #fff;
-      margin-top: 2rem;
-      letter-spacing: 0.1em;
-      text-shadow: 0 0 3px #fff8, 0 0 16px #000;
-      animation: ghostText 6s infinite alternate-reverse cubic-bezier(.86,0,.07,1);
+    nav li {
+      font-family: 'Unbounded', monospace; font-size: 1.22rem; letter-spacing: 0.18em;
+      text-transform: uppercase; position: relative; cursor: pointer;transition: 0.2s;
     }
-    .glitch {
+    nav li::after {
+      content: ''; display: block; width: 0; height: 3px; background: #fff;
+      position: absolute; left: 0; bottom: -5px; transition: 0.3s cubic-bezier(.23,1.3,.32,1);
+      box-shadow: 0 0 6px #fff, 0 0 24px #fff8;
+    }
+    nav li:hover { color: #000; background: #fff; text-shadow: 0 0 12px #fff7, 0 0 2px #000;}
+    nav li:hover::after { width: 100%; }
+    nav li.active { color: #fff; text-shadow: 0 0 10px #fff, 0 0 2px #fff;}
+    nav li.active::after { width: 100%; background: #fff; }
+
+    .main-content {
+      z-index: 1; position: relative; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding-top: 80px;
+    }
+    section {
+      width: 94vw; max-width: 880px; margin: 0 auto 60px auto; border-radius: 22px;
+      background: rgba(0,0,0,0.72); box-shadow: 0 0 80px 10px #fff1, 0 0 0 1px #fff3 inset;
+      padding: 54px 34px 44px 34px; margin-bottom: 90px;
+      transition: box-shadow 0.7s cubic-bezier(.8,2,.3,1), background 1.2s;
       position: relative;
-      color: #fff;
-      font-size: 2em;
-      animation: flicker 5s infinite alternate;
+      overflow: hidden;
+      backdrop-filter: blur(4px);
+      animation: ghostText 8s infinite alternate-reverse cubic-bezier(.86,0,.07,1);
+    }
+    section:not(:first-child) { opacity: 0; transform: translateY(80px) scale(0.97); pointer-events: none; transition: all 0.7s cubic-bezier(.8,2,.3,1);}
+    section.active { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; transition: all 0.8s cubic-bezier(.8,2,.3,1);}
+    h1, h2, h3 {
+      font-family: 'Unbounded', 'Share Tech Mono', monospace; color: #fff; letter-spacing: 0.21em;
+      text-shadow: 0 0 22px #fff, 0 0 4px #fff, 0 0 1px #fff;
+      margin-bottom: 22px;
+    }
+    h1 { font-size: 2.4rem; animation: flicker 4s infinite linear; }
+    h2 { font-size: 1.7rem; }
+    .glitch {
+      position: relative; color: #fff; font-size: 2.2em; animation: flicker 5s infinite alternate;
     }
     .glitch::before,
     .glitch::after {
-      content: attr(data-text);
-      position: absolute;
-      left: 0;
-      width: 100%;
-      overflow: hidden;
-      white-space: nowrap;
-      color: #fff;
-      background: transparent;
-      pointer-events: none;
+      content: attr(data-text); position: absolute; left: 0; width: 100%; overflow: hidden;
+      white-space: nowrap; color: #fff; background: transparent; pointer-events: none;
     }
     .glitch::before {
       text-shadow: 2px 0 #fff8, -2px 0 #0ff8;
-      left: 2px; top: 0;
-      animation: glitch-skew 1.2s infinite linear alternate-reverse;
+      left: 2px; top: 0; animation: glitch-skew 1.2s infinite linear alternate-reverse;
     }
     .glitch::after {
       text-shadow: -2px 0 #fff8, 2px 0 #f0f8;
-      left: -2px; top: 0;
-      animation: glitch-skew2 1.5s infinite linear alternate;
+      left: -2px; top: 0; animation: glitch-skew2 1.5s infinite linear alternate;
     }
+    .about-content {
+      font-size: 1.19rem; color: #fff; letter-spacing: 0.07em; margin-bottom: 1em;
+      text-shadow: 0 0 2px #fff8, 0 0 14px #000;
+      animation: ghostText 8s infinite alternate cubic-bezier(.86,0,.07,1);
+    }
+    .gallery-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 34px;
+      margin: 2em 0 1em 0; 
+    }
+    .gallery-item {
+      aspect-ratio: 1.1/1; background: #111; border-radius: 14px;
+      box-shadow: 0 0 24px #fff2, 0 0 0 1px #fff4 inset;
+      overflow: hidden; position: relative; cursor: pointer;
+      transition: transform 0.17s, box-shadow 0.17s;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .gallery-item:hover {
+      transform: scale(1.07) rotate(-2deg);
+      box-shadow: 0 0 44px #fff7, 0 0 0 4px #fff9 inset;
+      background: #fff;
+    }
+    .gallery-art {
+      width: 92%; height: 92%;
+      opacity: 0.93; filter: grayscale(1) blur(0.4px) contrast(1.22);
+      transition: filter 0.2s, opacity 0.2s;
+    }
+    .gallery-item:hover .gallery-art { filter: grayscale(0) blur(0); opacity: 1;}
+    .gallery-label {
+      position: absolute; bottom: 10px; left: 0; width: 100%; color: #fff;
+      background: rgba(0,0,0,0.72); font-size: 1.1em; text-align: center;
+      letter-spacing: 0.09em; opacity: 0; transition: opacity 0.18s;
+      pointer-events: none;
+      text-shadow: 0 0 6px #000a, 0 0 12px #fff;
+    }
+    .gallery-item:hover .gallery-label { opacity: 1;}
+    .contact-form {
+      display: flex; flex-direction: column; gap: 18px; margin-top: 1.3em;
+      width: 100%; max-width: 420px; margin-left: auto; margin-right: auto;
+    }
+    .contact-form input, .contact-form textarea {
+      background: #111; color: #fff; border: 1.5px solid #fff5; border-radius: 8px;
+      padding: 0.9em 1em; font-size: 1.05em; font-family: inherit;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    .contact-form input:focus, .contact-form textarea:focus {
+      border: 1.5px solid #fff; box-shadow: 0 0 8px #fff7;
+      outline: none;
+    }
+    .contact-form button {
+      background: #fff; color: #000; font-family: 'Unbounded', monospace;
+      font-size: 1.15em; padding: 0.66em 0; border: none; border-radius: 7px;
+      cursor: pointer; box-shadow: 0 0 14px #fff7, 0 0 0 1px #fff4 inset;
+      transition: background 0.2s, color 0.2s;
+      letter-spacing: 0.13em;
+    }
+    .contact-form button:hover { background: #000; color: #fff; }
+
+    /* Section Transitions */
+    .section-in { opacity: 1 !important; transform: translateY(0) scale(1) !important; pointer-events: auto;}
+    .section-out { opacity: 0 !important; transform: translateY(80px) scale(0.97) !important; pointer-events: none;}
+
+    /* Keyframes & Effects */
     @keyframes flicker {
       0%,100% { opacity: 1; text-shadow: 0 0 2px #fff, 0 0 10px #fff;}
       10% { text-shadow: 0 0 6px #0ff6, 0 0 30px #fff2;}
@@ -143,28 +193,97 @@
       65% { filter: blur(3px); opacity: 0.44;}
       85% { filter: blur(1px);}
     }
+
+    /* Responsive */
+    @media (max-width: 700px) {
+      nav ul { gap: 18px;}
+      .main-content { padding-top: 68px; }
+      section { padding: 18vw 5vw 18vw 5vw; }
+      h1 { font-size: 1.5rem; }
+      .gallery-grid { gap: 18px; }
+    }
     /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 8px; background: #111;}
     ::-webkit-scrollbar-thumb { background: #fff; border-radius: 4px; }
     ::selection { background: #fff; color: #000; }
-    /* Responsive */
-    @media (max-width: 600px) {
-      .main-content {
-        padding: 18vw 4vw;
-      }
-      h1 { font-size: 2.1rem; }
-    }
   </style>
 </head>
 <body>
   <canvas id="bg-canvas"></canvas>
+  <nav>
+    <ul>
+      <li class="nav-link active" data-section="home">Home</li>
+      <li class="nav-link" data-section="about">About</li>
+      <li class="nav-link" data-section="gallery">Gallery</li>
+      <li class="nav-link" data-section="contact">Contact</li>
+    </ul>
+  </nav>
   <div class="main-content">
-    <h1 class="glitch" data-text="VANTABLACK VISIONS">VANTABLACK VISIONS</h1>
-    <p>
-      <span style="font-size:1.5em;">&#9760;</span> Welcome to the void.<br>
-      <span style="font-size:1.2em;">Experience a living, glitching canvas of monochrome chaos and eerie shapes.<br>
-      Move your mouse or tap to awaken the unseen.</span>
-    </p>
+    <section id="home" class="active">
+      <h1 class="glitch" data-text="VANTABLACK VISIONS">VANTABLACK VISIONS</h1>
+      <div class="about-content" style="font-size:1.25em;">
+        <span style="font-size:1.6em;">&#9760;</span>  
+        Welcome to the void.<br>
+        <span style="font-size:1.1em;">
+          Explore a living, glitching web experience of monochrome chaos and eerie shapes.<br>
+          <span style="color:#fff7;">Move your mouse or tap to awaken the unseen.</span>
+        </span>
+      </div>
+    </section>
+    <section id="about">
+      <h2>About This Site</h2>
+      <div class="about-content">
+        <b>Vantablack Visions</b> is a surreal, modern web experience blending technology and horror.<br><br>
+        Every animation you see is generated in real-time, using only code.<br>
+        <b>Features:</b>
+        <ul style="margin-top:1em;">
+          <li>Procedural, interactive backgrounds</li>
+          <li>Glitch, flicker, and ghostly text/graphics</li>
+          <li>Responsive, eerie UI</li>
+          <li>No images or frameworks &mdash; just pure HTML, CSS, and JavaScript</li>
+        </ul>
+        <span style="opacity:0.68;font-size:1.2em;">Dare to explore deeper?</span>
+      </div>
+    </section>
+    <section id="gallery">
+      <h2>Gallery & Effects Showcase</h2>
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <canvas class="gallery-art" width="120" height="120" data-effect="spiral"></canvas>
+          <div class="gallery-label">Spiral Ghost</div>
+        </div>
+        <div class="gallery-item">
+          <canvas class="gallery-art" width="120" height="120" data-effect="glitch"></canvas>
+          <div class="gallery-label">Glitch Lines</div>
+        </div>
+        <div class="gallery-item">
+          <canvas class="gallery-art" width="120" height="120" data-effect="eye"></canvas>
+          <div class="gallery-label">Watcher</div>
+        </div>
+        <div class="gallery-item">
+          <canvas class="gallery-art" width="120" height="120" data-effect="cloud"></canvas>
+          <div class="gallery-label">Smoke Cloud</div>
+        </div>
+        <div class="gallery-item">
+          <canvas class="gallery-art" width="120" height="120" data-effect="ripple"></canvas>
+          <div class="gallery-label">Ripple Distortion</div>
+        </div>
+      </div>
+      <div class="about-content" style="font-size:1em;opacity:0.75;">
+        All gallery effects are generated live with JavaScript.<br>
+        Click/tap effects in the grid for a surprise!
+      </div>
+    </section>
+    <section id="contact">
+      <h2>Contact the Void</h2>
+      <form class="contact-form" autocomplete="off" onsubmit="return false;">
+        <input type="text" placeholder="Your name..." required>
+        <input type="email" placeholder="Your email..." required>
+        <textarea rows="4" placeholder="Your message..." required></textarea>
+        <button type="submit">Send Message</button>
+        <div id="contact-result" style="margin-top:1em;min-height:1.6em;font-size:1.1em;opacity:0.88;"></div>
+      </form>
+    </section>
   </div>
   <script>
     // === Monochrome Generative Glitch/Smoke/Particles BG ===
@@ -294,6 +413,162 @@
       requestAnimationFrame(draw);
     }
     draw();
+
+    // === Section Navigation ===
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('section');
+    function activateSection(sectionId) {
+      sections.forEach(sec => {
+        if(sec.id === sectionId) {
+          sec.classList.add('section-in','active');
+          sec.classList.remove('section-out');
+        } else {
+          sec.classList.remove('section-in','active');
+          sec.classList.add('section-out');
+        }
+      });
+      navLinks.forEach(nl => {
+        if(nl.dataset.section === sectionId) nl.classList.add('active');
+        else nl.classList.remove('active');
+      });
+    }
+    navLinks.forEach(nl => {
+      nl.addEventListener('click', e => activateSection(nl.dataset.section));
+    });
+
+    // === Gallery Effects ===
+    function drawSpiralGhost(ctx) {
+      ctx.clearRect(0,0,120,120);
+      ctx.save();
+      ctx.translate(60,60);
+      for(let i=0;i<60;i++){
+        let a = i*0.19 + Math.sin(Date.now()*0.001)*1.2;
+        let r = 12+i*1.3 + Math.sin(Date.now()*0.0009+i)*2.7;
+        ctx.beginPath();
+        ctx.arc(Math.cos(a)*r, Math.sin(a)*r, 2.8+Math.sin(Date.now()*0.0012+i)*1.3, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(255,255,255,${0.8-(i*0.013)})`;
+        ctx.shadowBlur = 8; ctx.shadowColor = '#fff';
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+    function drawGlitchLines(ctx) {
+      ctx.clearRect(0,0,120,120);
+      for(let i=0;i<4;i++) {
+        ctx.save();
+        ctx.globalAlpha = Math.random()*0.5+0.13;
+        ctx.strokeStyle = ["#fff", "#ccc", "#fff8"][i%3];
+        ctx.lineWidth = Math.random()*3+1;
+        ctx.beginPath();
+        let y = 20+i*22+Math.random()*19;
+        ctx.moveTo(0, y);
+        for(let j=0;j<4;j++) {
+          ctx.lineTo((120/4)*j + (Math.random()-0.5)*12, y + (Math.random()-0.5)*7);
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+    function drawEye(ctx) {
+      ctx.clearRect(0,0,120,120);
+      ctx.save();
+      ctx.translate(60,60);
+      ctx.beginPath();
+      ctx.ellipse(0,0,32,10+Math.sin(Date.now()*0.002)*2,0,0,Math.PI*2);
+      ctx.globalAlpha = 0.25;
+      ctx.fillStyle = "#fff";
+      ctx.shadowColor = "#fff";
+      ctx.shadowBlur = 15;
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(0,0,14+Math.sin(Date.now()*0.004)*3,7,0,0,Math.PI*2);
+      ctx.globalAlpha = 0.7;
+      ctx.fillStyle = "#111";
+      ctx.shadowBlur = 0;
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(0,0,4.2+Math.sin(Date.now()*0.007)*1.7,0,Math.PI*2);
+      ctx.globalAlpha = 0.98;
+      ctx.fillStyle = "#fff";
+      ctx.shadowBlur = 9;
+      ctx.fill();
+      ctx.restore();
+    }
+    function drawCloud(ctx) {
+      ctx.clearRect(0,0,120,120);
+      ctx.save();
+      for(let i=0;i<7;i++){
+        let x = 60+Math.sin(Date.now()*0.001+i)*28+Math.cos(i*1.2)*22;
+        let y = 60+Math.cos(Date.now()*0.0012+i)*18+Math.sin(i*0.7)*13;
+        ctx.beginPath();
+        ctx.arc(x,y, 17+Math.sin(Date.now()*0.002+i)*7, 0, Math.PI*2);
+        ctx.globalAlpha = 0.13 + Math.abs(Math.sin(Date.now()*0.001+i))*0.13;
+        ctx.fillStyle = "#fff";
+        ctx.shadowColor = "#fff";
+        ctx.shadowBlur = 16;
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+    function drawRipple(ctx) {
+      ctx.clearRect(0,0,120,120);
+      let t = Date.now()*0.005;
+      for(let i=0;i<4;i++){
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(60,60,18+i*13+t%8,0,Math.PI*2);
+        ctx.globalAlpha = 0.18 + Math.abs(Math.sin(t+i))*0.18;
+        ctx.strokeStyle = "#fff";
+        ctx.shadowBlur = 7; ctx.shadowColor = "#fff";
+        ctx.lineWidth = 2.6-Math.sin(t+i)*1.3;
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+    const galleryCanvases = document.querySelectorAll('.gallery-art');
+    function loopGallery() {
+      galleryCanvases.forEach(c => {
+        let ctx = c.getContext('2d');
+        if(c.dataset.effect==='spiral') drawSpiralGhost(ctx);
+        if(c.dataset.effect==='glitch') drawGlitchLines(ctx);
+        if(c.dataset.effect==='eye') drawEye(ctx);
+        if(c.dataset.effect==='cloud') drawCloud(ctx);
+        if(c.dataset.effect==='ripple') drawRipple(ctx);
+      });
+      requestAnimationFrame(loopGallery);
+    }
+    loopGallery();
+    // Click surprise (ripple burst)
+    document.querySelectorAll('.gallery-item').forEach((item, idx) => {
+      item.addEventListener('click', e => {
+        let rect = item.getBoundingClientRect();
+        let x = rect.left + rect.width/2 + window.scrollX;
+        let y = rect.top + rect.height/2 + window.scrollY;
+        for(let i=0;i<4;i++)
+          ripple(x + (Math.random()-0.5)*100, y + (Math.random()-0.5)*100);
+      });
+    });
+
+    // === Contact Form (fake send) ===
+    document.querySelector('.contact-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      document.getElementById('contact-result').textContent = "Your message has been sent into the void...";
+      setTimeout(()=>document.getElementById('contact-result').textContent = '', 3200);
+      this.reset();
+    });
+
+    // Direct link navigation with hash
+    function showSectionFromHash() {
+      let hash = window.location.hash.replace('#','');
+      if(hash && document.getElementById(hash)) activateSection(hash);
+    }
+    window.addEventListener('hashchange', showSectionFromHash);
+    // On nav click, set hash
+    navLinks.forEach(nl=>{
+      nl.addEventListener('click', ()=>{window.location.hash = nl.dataset.section;});
+    });
+    // On load
+    showSectionFromHash();
   </script>
 </body>
 </html>
